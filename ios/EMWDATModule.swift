@@ -220,6 +220,45 @@ public class EMWDATModule: Module {
             AudioSessionManager.isActive
         }
 
+        // MARK: - Audio (A2DP media playback)
+
+        AsyncFunction("configureWearablesA2dpPlayback") { (promise: Promise) in
+            Task { @MainActor in
+                do {
+                    let result = try A2dpPlaybackManager.shared.configure()
+                    promise.resolve(result)
+                } catch {
+                    promise.reject("A2DP_CONFIGURE_FAILED", error.localizedDescription)
+                }
+            }
+        }
+
+        AsyncFunction("activateWearablesA2dpPlayback") { (promise: Promise) in
+            Task { @MainActor in
+                do {
+                    let result = try A2dpPlaybackManager.shared.activate()
+                    promise.resolve(result)
+                } catch {
+                    promise.reject("A2DP_ACTIVATE_FAILED", error.localizedDescription)
+                }
+            }
+        }
+
+        AsyncFunction("deactivateWearablesA2dpPlayback") { (promise: Promise) in
+            Task { @MainActor in
+                do {
+                    try A2dpPlaybackManager.shared.deactivate()
+                    promise.resolve(nil)
+                } catch {
+                    promise.reject("A2DP_DEACTIVATE_FAILED", error.localizedDescription)
+                }
+            }
+        }
+
+        Function("isWearablesA2dpPlaybackActive") {
+            A2dpPlaybackManager.isActive
+        }
+
         // MARK: - Devices
 
         AsyncFunction("getDevices") { (promise: Promise) in

@@ -29,6 +29,10 @@ public final class AudioSessionManager {
 
     @discardableResult
     public func activate() async throws -> [String: Any] {
+        if WearablesA2dpPlaybackState.isActive {
+            try A2dpPlaybackManager.shared.deactivate()
+        }
+
         let session = AVAudioSession.sharedInstance()
         if session.recordPermission == .undetermined {
             await withCheckedContinuation { continuation in

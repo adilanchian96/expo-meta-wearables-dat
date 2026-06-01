@@ -26,11 +26,15 @@ import {
   addListener,
   addStreamToSession as nativeAddStreamToSession,
   capturePhoto as nativeCapturePhoto,
+  activateWearablesA2dpPlayback as nativeActivateWearablesA2dpPlayback,
   activateWearablesAudioSession as nativeActivateWearablesAudioSession,
   checkPermissionStatus as nativeCheckPermissionStatus,
   configure as nativeConfigure,
+  configureWearablesA2dpPlayback as nativeConfigureWearablesA2dpPlayback,
   configureWearablesAudioSession as nativeConfigureWearablesAudioSession,
+  deactivateWearablesA2dpPlayback as nativeDeactivateWearablesA2dpPlayback,
   deactivateWearablesAudioSession as nativeDeactivateWearablesAudioSession,
+  isWearablesA2dpPlaybackActive as nativeIsWearablesA2dpPlaybackActive,
   isWearablesAudioSessionActive as nativeIsWearablesAudioSessionActive,
   createSession as nativeCreateSession,
   disableMockDeviceKit as nativeDisableMockDeviceKit,
@@ -107,6 +111,7 @@ export function useMetaWearables(options: UseMetaWearablesOptions = {}): UseMeta
   const [microphonePermissionStatus, setMicrophonePermissionStatus] =
     useState<PermissionStatus>("denied");
   const [isWearablesAudioActive, setIsWearablesAudioActive] = useState(false);
+  const [isWearablesA2dpPlaybackActive, setIsWearablesA2dpPlaybackActive] = useState(false);
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceSessionStates, setDeviceSessionStates] = useState<
     Record<string, DeviceSessionState>
@@ -164,6 +169,7 @@ export function useMetaWearables(options: UseMetaWearablesOptions = {}): UseMeta
           syncPermissionStatus("denied");
           syncMicrophonePermissionStatus("denied");
           setIsWearablesAudioActive(false);
+          setIsWearablesA2dpPlaybackActive(false);
           setStreamState("stopped");
           setDeviceSessionStates({});
           setDeviceSessionErrors({});
@@ -550,6 +556,27 @@ export function useMetaWearables(options: UseMetaWearablesOptions = {}): UseMeta
     setIsWearablesAudioActive(false);
   }, []);
 
+  const configureWearablesA2dpPlaybackAction = useCallback(async () => {
+    if (!isConfiguredRef.current) {
+      throw new Error("SDK not configured. Call configure() first.");
+    }
+    return nativeConfigureWearablesA2dpPlayback();
+  }, []);
+
+  const activateWearablesA2dpPlaybackAction = useCallback(async () => {
+    if (!isConfiguredRef.current) {
+      throw new Error("SDK not configured. Call configure() first.");
+    }
+    const result = await nativeActivateWearablesA2dpPlayback();
+    setIsWearablesA2dpPlaybackActive(nativeIsWearablesA2dpPlaybackActive());
+    return result;
+  }, []);
+
+  const deactivateWearablesA2dpPlaybackAction = useCallback(async () => {
+    await nativeDeactivateWearablesA2dpPlayback();
+    setIsWearablesA2dpPlaybackActive(false);
+  }, []);
+
   // ---------------------------------------------------------------------------
   // Return
   // ---------------------------------------------------------------------------
@@ -563,6 +590,7 @@ export function useMetaWearables(options: UseMetaWearablesOptions = {}): UseMeta
     permissionStatus,
     microphonePermissionStatus,
     isWearablesAudioActive,
+    isWearablesA2dpPlaybackActive,
     devices,
     deviceSessionStates,
     deviceSessionErrors,
@@ -586,6 +614,9 @@ export function useMetaWearables(options: UseMetaWearablesOptions = {}): UseMeta
     configureWearablesAudioSession: configureWearablesAudioSessionAction,
     activateWearablesAudioSession: activateWearablesAudioSessionAction,
     deactivateWearablesAudioSession: deactivateWearablesAudioSessionAction,
+    configureWearablesA2dpPlayback: configureWearablesA2dpPlaybackAction,
+    activateWearablesA2dpPlayback: activateWearablesA2dpPlaybackAction,
+    deactivateWearablesA2dpPlayback: deactivateWearablesA2dpPlaybackAction,
 
     // Actions — devices
     getDevice,

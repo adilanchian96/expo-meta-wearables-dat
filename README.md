@@ -22,7 +22,7 @@ Expo native module for integrating **Meta Wearables DAT** (Ray-Ban Meta smart gl
 
 - Device registration / unregistration via Meta AI app
 - Permission management (camera, microphone)
-- Audio session helpers for glasses microphone/speaker (Bluetooth HFP)
+- Audio session helpers: HFP voice (mic/speaker) and A2DP media playback
 - Device discovery and link state monitoring
 - Session-based camera streaming with native view
 - Compressed HEVC video streaming (Android)
@@ -235,19 +235,20 @@ React hook that manages the full lifecycle of Meta Wearables integration.
 
 **Returned state:**
 
-| Field                        | Type                                  | Description                        |
-| ---------------------------- | ------------------------------------- | ---------------------------------- |
-| `isConfigured`               | `boolean`                             | SDK configured                     |
-| `isConfiguring`              | `boolean`                             | `true` while configuring           |
-| `configError`                | `Error \| null`                       | Error from last `configure`        |
-| `registrationState`          | `RegistrationState`                   | Registration lifecycle state       |
-| `permissionStatus`           | `PermissionStatus`                    | Camera — `"granted"` \| `"denied"` |
-| `microphonePermissionStatus` | `PermissionStatus`                    | Microphone (Meta AI)               |
-| `isWearablesAudioActive`     | `boolean`                             | HFP audio session active           |
-| `devices`                    | `Device[]`                            | Connected devices                  |
-| `deviceSessionStates`        | `Record<string, DeviceSessionState>`  | Per-session states                 |
-| `deviceSessionErrors`        | `Record<string, { error, message? }>` | Per-session errors                 |
-| `capabilityStates`           | `Record<string, CapabilityState>`     | Per-session capability state       |
+| Field                           | Type                                  | Description                        |
+| ------------------------------- | ------------------------------------- | ---------------------------------- |
+| `isConfigured`                  | `boolean`                             | SDK configured                     |
+| `isConfiguring`                 | `boolean`                             | `true` while configuring           |
+| `configError`                   | `Error \| null`                       | Error from last `configure`        |
+| `registrationState`             | `RegistrationState`                   | Registration lifecycle state       |
+| `permissionStatus`              | `PermissionStatus`                    | Camera — `"granted"` \| `"denied"` |
+| `microphonePermissionStatus`    | `PermissionStatus`                    | Microphone (Meta AI)               |
+| `isWearablesAudioActive`        | `boolean`                             | HFP audio session active           |
+| `isWearablesA2dpPlaybackActive` | `boolean`                             | A2DP media playback active         |
+| `devices`                       | `Device[]`                            | Connected devices                  |
+| `deviceSessionStates`           | `Record<string, DeviceSessionState>`  | Per-session states                 |
+| `deviceSessionErrors`           | `Record<string, { error, message? }>` | Per-session errors                 |
+| `capabilityStates`              | `Record<string, CapabilityState>`     | Per-session capability state       |
 
 **Returned actions:**
 
@@ -262,6 +263,9 @@ React hook that manages the full lifecycle of Meta Wearables integration.
 | `configureWearablesAudioSession`    | `() => Promise<WearablesAudioSessionStatus>` | Prepare AVAudioSession / check mic                |
 | `activateWearablesAudioSession`     | `() => Promise<WearablesAudioSessionStatus>` | Route audio to glasses (HFP)                      |
 | `deactivateWearablesAudioSession`   | `() => Promise<void>`                        | Release HFP session                               |
+| `configureWearablesA2dpPlayback`    | `() => Promise<WearablesA2dpPlaybackStatus>` | Prepare A2DP media playback                       |
+| `activateWearablesA2dpPlayback`     | `() => Promise<WearablesA2dpPlaybackStatus>` | Route media to glasses (A2DP)                     |
+| `deactivateWearablesA2dpPlayback`   | `() => Promise<void>`                        | Release A2DP session                              |
 | `getDevice`                         | `(id) => Promise<Device \| null>`            | Get device by identifier                          |
 | `refreshDevices`                    | `() => Promise<Device[]>`                    | Refresh device list                               |
 | `createSession`                     | `(deviceId?) => Promise<string>`             | Create a device session                           |
@@ -296,6 +300,9 @@ import {
   configureWearablesAudioSession,
   activateWearablesAudioSession,
   deactivateWearablesAudioSession,
+  configureWearablesA2dpPlayback,
+  activateWearablesA2dpPlayback,
+  deactivateWearablesA2dpPlayback,
   getDevices,
   getDevice,
   getRegistrationState,
@@ -364,7 +371,8 @@ Key types exported from the package:
 - `LogLevel` — `"debug"` \| `"info"` \| `"warn"` \| `"error"` \| `"none"`
 - `RegistrationState` — `"unavailable"` \| `"available"` \| `"registering"` \| `"registered"`
 - `Permission` — `"camera"` \| `"microphone"`
-- `WearablesAudioSessionStatus` — `{ active, routedToBluetooth?, platformMicGranted? }`
+- `WearablesAudioSessionStatus` — `{ active, routedToBluetooth?, platformMicGranted? }` (HFP voice)
+- `WearablesA2dpPlaybackStatus` — `{ active, routedToBluetooth?, a2dpDeviceAvailable? }` (media)
 - `PermissionStatus` — `"granted"` \| `"denied"`
 - `Device` — `{ identifier, name, linkState, deviceType, compatibility }`
 - `DeviceType` — `"rayBanMeta"` \| `"oakleyMetaHSTN"` \| `"oakleyMetaVanguard"` \| `"metaRayBanDisplay"` \| `"rayBanMetaOptics"` \| `"unknown"`

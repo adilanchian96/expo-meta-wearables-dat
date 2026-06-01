@@ -8,6 +8,7 @@ import type {
   DisplayContentNode,
   EMWDATPluginProps,
   Permission,
+  WearablesA2dpPlaybackStatus,
   WearablesAudioSessionStatus,
 } from "../EMWDAT.types";
 
@@ -24,6 +25,15 @@ describe("permissions and audio types", () => {
       platformMicGranted: false,
     };
     expect(status.active).toBe(true);
+  });
+
+  it("WearablesA2dpPlaybackStatus shape", () => {
+    const status: WearablesA2dpPlaybackStatus = {
+      active: true,
+      routedToBluetooth: true,
+      a2dpDeviceAvailable: true,
+    };
+    expect(status.a2dpDeviceAvailable).toBe(true);
   });
 });
 

@@ -30,10 +30,23 @@ export type PermissionStatus = "granted" | "denied";
 export interface WearablesAudioSessionStatus {
   /** Whether the HFP audio session is active after activate(). */
   active: boolean;
-  /** Android: whether audio was routed to a Bluetooth SCO device. */
+  /** Whether audio was routed to a Bluetooth device (SCO on Android, HFP/A2DP route on iOS). */
   routedToBluetooth?: boolean;
   /** Whether the OS microphone permission is granted (RECORD_AUDIO / AVAudioSession). */
   platformMicGranted?: boolean;
+}
+
+/**
+ * Result from configuring or activating A2DP media playback to glasses speakers.
+ * Output-only, higher quality than HFP voice (8 kHz mono).
+ */
+export interface WearablesA2dpPlaybackStatus {
+  /** Whether A2DP playback session is active after activate(). */
+  active: boolean;
+  /** Whether output is routed to a Bluetooth A2DP device. */
+  routedToBluetooth?: boolean;
+  /** Whether a Bluetooth A2DP output device is available. */
+  a2dpDeviceAvailable?: boolean;
 }
 
 // =============================================================================
@@ -374,6 +387,8 @@ export interface UseMetaWearablesReturn {
   microphonePermissionStatus: PermissionStatus;
   /** Whether {@link activateWearablesAudioSession} has routed HFP audio. */
   isWearablesAudioActive: boolean;
+  /** Whether {@link activateWearablesA2dpPlayback} has prepared A2DP media routing. */
+  isWearablesA2dpPlaybackActive: boolean;
   devices: Device[];
   deviceSessionStates: Record<string, DeviceSessionState>;
   deviceSessionErrors: Record<string, { error: DeviceSessionErrorCode; message?: string }>;
@@ -396,6 +411,9 @@ export interface UseMetaWearablesReturn {
   configureWearablesAudioSession: () => Promise<WearablesAudioSessionStatus>;
   activateWearablesAudioSession: () => Promise<WearablesAudioSessionStatus>;
   deactivateWearablesAudioSession: () => Promise<void>;
+  configureWearablesA2dpPlayback: () => Promise<WearablesA2dpPlaybackStatus>;
+  activateWearablesA2dpPlayback: () => Promise<WearablesA2dpPlaybackStatus>;
+  deactivateWearablesA2dpPlayback: () => Promise<void>;
 
   // Actions — devices
   getDevice: (identifier: DeviceIdentifier) => Promise<Device | null>;

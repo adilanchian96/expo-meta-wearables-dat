@@ -183,6 +183,30 @@ class EMWDATModule : Module() {
             AudioSessionManager.isActive()
         }
 
+        // MARK: - Audio (A2DP media playback)
+
+        AsyncFunction("configureWearablesA2dpPlayback") {
+            val context = appContext.reactContext?.applicationContext
+                ?: throw Exception("Application context not available")
+            A2dpPlaybackManager.configure(context)
+        }
+
+        AsyncFunction("activateWearablesA2dpPlayback") {
+            val context = appContext.reactContext?.applicationContext
+                ?: throw Exception("Application context not available")
+            A2dpPlaybackManager.activate(context)
+        }
+
+        AsyncFunction("deactivateWearablesA2dpPlayback") {
+            val context = appContext.reactContext?.applicationContext
+                ?: throw Exception("Application context not available")
+            A2dpPlaybackManager.deactivate(context)
+        }
+
+        Function("isWearablesA2dpPlaybackActive") {
+            A2dpPlaybackManager.isActive()
+        }
+
         // MARK: - Devices
 
         AsyncFunction("getDevices") {

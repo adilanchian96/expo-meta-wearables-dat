@@ -22,6 +22,10 @@ export {
   activateWearablesAudioSession,
   deactivateWearablesAudioSession,
   isWearablesAudioSessionActive,
+  configureWearablesA2dpPlayback,
+  activateWearablesA2dpPlayback,
+  deactivateWearablesA2dpPlayback,
+  isWearablesA2dpPlaybackActive,
   getDevices,
   getDevice,
   // Session-based streaming

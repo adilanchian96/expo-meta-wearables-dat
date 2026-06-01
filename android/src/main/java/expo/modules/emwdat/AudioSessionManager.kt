@@ -28,6 +28,10 @@ object AudioSessionManager {
     }
 
     fun activate(context: Context): Map<String, Any> {
+        if (A2dpPlaybackManager.isActive()) {
+            A2dpPlaybackManager.deactivate(context)
+        }
+
         val hasRecordAudio = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.RECORD_AUDIO

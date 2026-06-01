@@ -11,6 +11,7 @@ import type {
   Permission,
   PermissionStatus,
   PhotoCaptureFormat,
+  WearablesA2dpPlaybackStatus,
   WearablesAudioSessionStatus,
   RegistrationState,
   StreamSessionConfig,
@@ -34,6 +35,10 @@ declare class EMWDATNativeModule extends NativeModule<EMWDATModuleEvents> {
   activateWearablesAudioSession(): Promise<WearablesAudioSessionStatus>;
   deactivateWearablesAudioSession(): Promise<void>;
   isWearablesAudioSessionActive(): boolean;
+  configureWearablesA2dpPlayback(): Promise<WearablesA2dpPlaybackStatus>;
+  activateWearablesA2dpPlayback(): Promise<WearablesA2dpPlaybackStatus>;
+  deactivateWearablesA2dpPlayback(): Promise<void>;
+  isWearablesA2dpPlaybackActive(): boolean;
   getDevices(): Promise<Device[]>;
   getDevice(identifier: string): Promise<Device | null>;
 
@@ -162,6 +167,31 @@ export async function deactivateWearablesAudioSession(): Promise<void> {
 /** Whether {@link activateWearablesAudioSession} is currently active. */
 export function isWearablesAudioSessionActive(): boolean {
   return EMWDATModule.isWearablesAudioSessionActive();
+}
+
+/**
+ * Prepare AVAudioSession / AudioManager for high-quality media playback over Bluetooth A2DP.
+ * Deactivates an active HFP session if present.
+ */
+export async function configureWearablesA2dpPlayback(): Promise<WearablesA2dpPlaybackStatus> {
+  return EMWDATModule.configureWearablesA2dpPlayback();
+}
+
+/**
+ * Activate A2DP media routing to glasses. Use with expo-av or other media players after this call.
+ */
+export async function activateWearablesA2dpPlayback(): Promise<WearablesA2dpPlaybackStatus> {
+  return EMWDATModule.activateWearablesA2dpPlayback();
+}
+
+/** Release the A2DP playback audio session. */
+export async function deactivateWearablesA2dpPlayback(): Promise<void> {
+  return EMWDATModule.deactivateWearablesA2dpPlayback();
+}
+
+/** Whether {@link activateWearablesA2dpPlayback} is currently active. */
+export function isWearablesA2dpPlaybackActive(): boolean {
+  return EMWDATModule.isWearablesA2dpPlaybackActive();
 }
 
 /** Return all registered Meta Wearables devices. */

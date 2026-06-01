@@ -48,6 +48,18 @@ class EMWDATWebModule extends NativeModule<EMWDATModuleEvents> {
   isWearablesAudioSessionActive(): boolean {
     unsupported();
   }
+  configureWearablesA2dpPlayback(): Promise<never> {
+    unsupported();
+  }
+  activateWearablesA2dpPlayback(): Promise<never> {
+    unsupported();
+  }
+  deactivateWearablesA2dpPlayback(): Promise<void> {
+    unsupported();
+  }
+  isWearablesA2dpPlaybackActive(): boolean {
+    unsupported();
+  }
   getDevices(): Promise<never[]> {
     unsupported();
   }
@@ -186,6 +198,18 @@ export async function deactivateWearablesAudioSession(): Promise<void> {
   unsupported();
 }
 export function isWearablesAudioSessionActive(): boolean {
+  unsupported();
+}
+export async function configureWearablesA2dpPlayback(): Promise<never> {
+  unsupported();
+}
+export async function activateWearablesA2dpPlayback(): Promise<never> {
+  unsupported();
+}
+export async function deactivateWearablesA2dpPlayback(): Promise<void> {
+  unsupported();
+}
+export function isWearablesA2dpPlaybackActive(): boolean {
   unsupported();
 }
 export async function getDevices(): Promise<never[]> {
