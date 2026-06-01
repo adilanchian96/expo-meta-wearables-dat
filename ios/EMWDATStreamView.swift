@@ -38,7 +38,7 @@ public class EMWDATStreamView: ExpoView {
     /// Called by EMWDATModule Prop("isActive")
     func setActive(_ active: Bool) {
         isActive = active
-        Task { @MainActor in
+        Swift.Task { @MainActor in
             if active {
                 self.logger.info("StreamView", "Subscribing to frames", context: ["viewId": self.viewId.uuidString.prefix(8)])
                 StreamSessionManager.shared.setFrameCallback({ [weak self] image in

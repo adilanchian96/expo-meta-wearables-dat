@@ -8,7 +8,7 @@ public class EMWDATAppDelegateSubscriber: ExpoAppDelegateSubscriber {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         // handleUrl is async in SDK 0.4 — fire-and-forget since delegate must return synchronously
-        Task {
+        Swift.Task {
             do {
                 _ = try await Wearables.shared.handleUrl(url)
             } catch {

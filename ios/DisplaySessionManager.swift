@@ -14,7 +14,7 @@ public final class DisplaySessionManager {
     private let logger = EMWDATLogger.shared
     private var displays: [String: Display] = [:]
     private var stateTokens: [String: AnyListenerToken] = [:]
-    private var attachTasks: [String: Task<Void, Error>] = [:]
+    private var attachTasks: [String: Swift.Task<Void, Error>] = [:]
     private var eventEmitter: EventEmitterDisplay?
 
     private init() {}
@@ -54,7 +54,7 @@ public final class DisplaySessionManager {
 
         let tree = DisplayContentBuilder.dictionary(from: contentTree) ?? contentTree
         guard let view = DisplayContentBuilder.buildRootFlexBox(from: tree, onInteraction: { [weak self] id in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.emit("onDisplayInteraction", ["sessionId": sessionId, "interactionId": id])
             }
         }) else {
@@ -85,7 +85,7 @@ public final class DisplaySessionManager {
             return
         }
 
-        let task = Task { @MainActor in
+        let task = Swift.Task { @MainActor in
             try await self.attachDisplayToSession(sessionId: sessionId)
         }
         attachTasks[sessionId] = task
@@ -106,7 +106,7 @@ public final class DisplaySessionManager {
         displays[sessionId] = display
 
         stateTokens[sessionId] = display.statePublisher.listen { [weak self] state in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.emitDisplayState(sessionId: sessionId, state: state)
             }
         }
@@ -150,7 +150,7 @@ public final class DisplaySessionManager {
 
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(timeoutSeconds * 1_000_000_000))
+                try await Swift.Task.sleep(nanoseconds: UInt64(timeoutSeconds * 1_000_000_000))
                 throw DisplaySessionManagerError.displayNotReady("Timed out waiting for display started")
             }
             group.addTask {

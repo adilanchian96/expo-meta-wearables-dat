@@ -87,12 +87,17 @@ describe("EMWDATModule wrappers", () => {
   describe("session-based streaming", () => {
     it("createSession passes deviceId to native", async () => {
       await createSession("device-abc");
-      expect(native.createSession).toHaveBeenCalledWith("device-abc");
+      expect(native.createSession).toHaveBeenCalledWith("device-abc", undefined);
     });
 
     it("createSession passes undefined when no deviceId", async () => {
       await createSession();
-      expect(native.createSession).toHaveBeenCalledWith(undefined);
+      expect(native.createSession).toHaveBeenCalledWith(undefined, undefined);
+    });
+
+    it("createSession passes displayCapableOnly to native", async () => {
+      await createSession(undefined, true);
+      expect(native.createSession).toHaveBeenCalledWith(undefined, true);
     });
 
     it("addStreamToSession defaults to empty config when called without config", async () => {
@@ -101,7 +106,10 @@ describe("EMWDATModule wrappers", () => {
     });
 
     it("addStreamToSession passes config with compressVideo", async () => {
-      await addStreamToSession("session-123", { compressVideo: true, resolution: "high" });
+      await addStreamToSession("session-123", {
+        compressVideo: true,
+        resolution: "high",
+      });
       expect(native.addStreamToSession).toHaveBeenCalledWith("session-123", {
         compressVideo: true,
         resolution: "high",

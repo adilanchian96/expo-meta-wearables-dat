@@ -31,7 +31,7 @@ public class EMWDATModule: Module {
 
         OnCreate {
             self.logger.info("Module", "Module created")
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 let emitter: EventEmitter = { [weak self] name, body in
                     self?.sendEvent(name, body)
                 }
@@ -43,7 +43,7 @@ public class EMWDATModule: Module {
 
         OnDestroy {
             self.logger.info("Module", "Module destroyed")
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 DisplaySessionManager.shared.destroy()
                 StreamSessionManager.shared.destroy()
                 WearablesManager.shared.cleanup()
@@ -69,7 +69,7 @@ public class EMWDATModule: Module {
         // MARK: - Configuration
 
         AsyncFunction("configure") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try WearablesManager.shared.configure()
                     promise.resolve(nil)
@@ -88,14 +88,14 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("getRegistrationStateAsync") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 let state = WearablesManager.shared.currentRegistrationState
                 promise.resolve(self.mapRegistrationState(state))
             }
         }
 
         AsyncFunction("startRegistration") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try await WearablesManager.shared.startRegistration()
                     promise.resolve(nil)
@@ -108,7 +108,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("startUnregistration") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try await WearablesManager.shared.startUnregistration()
                     promise.resolve(nil)
@@ -128,7 +128,7 @@ public class EMWDATModule: Module {
                 promise.resolve(false)
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let handled = try await Wearables.shared.handleUrl(parsedUrl)
                     promise.resolve(handled)
@@ -155,7 +155,7 @@ public class EMWDATModule: Module {
                 promise.resolve("denied")
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let status = try await WearablesManager.shared.checkPermissionStatus(sdkPermission)
                     promise.resolve(self.mapPermissionStatus(status))
@@ -171,7 +171,7 @@ public class EMWDATModule: Module {
                 promise.reject("INVALID_PERMISSION", "Unknown permission: \(permission)")
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let status = try await WearablesManager.shared.requestPermission(sdkPermission)
                     promise.resolve(self.mapPermissionStatus(status))
@@ -184,7 +184,7 @@ public class EMWDATModule: Module {
         // MARK: - Audio (HFP over Bluetooth)
 
         AsyncFunction("configureWearablesAudioSession") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let result = try AudioSessionManager.shared.configure()
                     promise.resolve(result)
@@ -195,7 +195,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("activateWearablesAudioSession") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let result = try await AudioSessionManager.shared.activate()
                     promise.resolve(result)
@@ -206,7 +206,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("deactivateWearablesAudioSession") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try AudioSessionManager.shared.deactivate()
                     promise.resolve(nil)
@@ -223,13 +223,13 @@ public class EMWDATModule: Module {
         // MARK: - Devices
 
         AsyncFunction("getDevices") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 promise.resolve(WearablesManager.shared.getDevices())
             }
         }
 
         AsyncFunction("getDevice") { (identifier: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 promise.resolve(WearablesManager.shared.getDevice(identifier: identifier))
             }
         }
@@ -237,7 +237,7 @@ public class EMWDATModule: Module {
         // MARK: - Session Management
 
         AsyncFunction("createSession") { (deviceId: String?, displayCapableOnly: Bool?, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let sessionId = try WearablesManager.shared.createSession(
                         deviceId: deviceId,
@@ -251,7 +251,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("startSession") { (sessionId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try WearablesManager.shared.startSession(sessionId: sessionId)
                     promise.resolve(nil)
@@ -262,7 +262,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("stopSession") { (sessionId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try WearablesManager.shared.stopSession(sessionId: sessionId)
                     promise.resolve(nil)
@@ -273,7 +273,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("addStreamToSession") { (sessionId: String, config: [String: Any], promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     let sessionConfig = StreamSessionManager.parseConfig(from: config)
                     try await StreamSessionManager.shared.addStreamToSession(sessionId: sessionId, config: sessionConfig)
@@ -285,7 +285,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("removeStreamFromSession") { (sessionId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 await StreamSessionManager.shared.removeStreamFromSession(sessionId: sessionId)
                 promise.resolve(nil)
             }
@@ -294,7 +294,7 @@ public class EMWDATModule: Module {
         // MARK: - Photo Capture
 
         AsyncFunction("capturePhoto") { (format: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 let photoFormat: PhotoCaptureFormat = format == "heic" ? .heic : .jpeg
                 let success = StreamSessionManager.shared.capturePhoto(format: photoFormat)
                 if success {
@@ -309,7 +309,7 @@ public class EMWDATModule: Module {
 
         #if DEBUG
         AsyncFunction("enableMockDeviceKit") { (config: [String: Any], promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 let initiallyRegistered = config["initiallyRegistered"] as? Bool ?? true
                 let initialPermissionsGranted = config["initialPermissionsGranted"] as? Bool ?? true
                 MockDeviceManager.shared.enableMockDeviceKit(
@@ -321,27 +321,27 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("disableMockDeviceKit") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 MockDeviceManager.shared.disableMockDeviceKit()
                 promise.resolve(nil)
             }
         }
 
         AsyncFunction("isMockDeviceKitEnabled") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 promise.resolve(MockDeviceManager.shared.isMockDeviceKitEnabled())
             }
         }
 
         AsyncFunction("pairMockDevice") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 let id = MockDeviceManager.shared.pairMockDevice()
                 promise.resolve(id)
             }
         }
 
         AsyncFunction("unpairMockDevice") { (deviceId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.unpairMockDevice(id: deviceId)
                     promise.resolve(nil)
@@ -352,13 +352,13 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("getMockDevices") { (promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 promise.resolve(MockDeviceManager.shared.getMockDevices())
             }
         }
 
         AsyncFunction("mockDevicePowerOn") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.powerOn(id: id)
                     promise.resolve(nil)
@@ -369,7 +369,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDevicePowerOff") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.powerOff(id: id)
                     promise.resolve(nil)
@@ -380,7 +380,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDeviceDon") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.don(id: id)
                     promise.resolve(nil)
@@ -391,7 +391,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDeviceDoff") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.doff(id: id)
                     promise.resolve(nil)
@@ -402,7 +402,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDeviceFold") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.fold(id: id)
                     promise.resolve(nil)
@@ -413,7 +413,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDeviceUnfold") { (id: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.unfold(id: id)
                     promise.resolve(nil)
@@ -434,7 +434,7 @@ public class EMWDATModule: Module {
                 promise.reject("MOCK_DEVICE_ERROR", "Invalid file URL: \(fileUrl)")
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.setCameraFeed(id: id, fileURL: url)
                     promise.resolve(nil)
@@ -455,7 +455,7 @@ public class EMWDATModule: Module {
                 promise.reject("MOCK_DEVICE_ERROR", "Invalid file URL: \(fileUrl)")
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try MockDeviceManager.shared.setCapturedImage(id: id, fileURL: url)
                     promise.resolve(nil)
@@ -466,7 +466,7 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockDeviceSetCameraFeedFromCamera") { (id: String, facing: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try await MockDeviceManager.shared.setCameraFeedFromCamera(id: id, facing: facing)
                     promise.resolve(nil)
@@ -477,14 +477,14 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("mockSetPermissionStatus") { (permission: String, status: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 MockDeviceManager.shared.setPermissionStatus(permission: permission, status: status)
                 promise.resolve(nil)
             }
         }
 
         AsyncFunction("mockSetPermissionRequestResult") { (permission: String, result: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 MockDeviceManager.shared.setPermissionRequestResult(permission: permission, result: result)
                 promise.resolve(nil)
             }
@@ -494,7 +494,7 @@ public class EMWDATModule: Module {
         // MARK: - Display
 
         AsyncFunction("addDisplayToSession") { (sessionId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try await DisplaySessionManager.shared.addDisplayToSession(sessionId: sessionId)
                     promise.resolve(nil)
@@ -505,14 +505,14 @@ public class EMWDATModule: Module {
         }
 
         AsyncFunction("removeDisplayFromSession") { (sessionId: String, promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 await DisplaySessionManager.shared.removeDisplayFromSession(sessionId: sessionId)
                 promise.resolve(nil)
             }
         }
 
         AsyncFunction("sendDisplayContent") { (sessionId: String, contentTree: [String: Any], promise: Promise) in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 do {
                     try await DisplaySessionManager.shared.sendDisplayContent(sessionId: sessionId, contentTree: contentTree)
                     promise.resolve(nil)

@@ -80,28 +80,28 @@ public final class StreamSessionManager {
 
         // Subscribe to state changes
         stateTokens[sessionId] = streamSession.statePublisher.listen { [weak self] state in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleStateChange(sessionId: sessionId, state: state)
             }
         }
 
         // Subscribe to video frames
         frameTokens[sessionId] = streamSession.videoFramePublisher.listen { [weak self] frame in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleVideoFrame(sessionId: sessionId, frame: frame)
             }
         }
 
         // Subscribe to errors
         errorTokens[sessionId] = streamSession.errorPublisher.listen { [weak self] error in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleError(sessionId: sessionId, error: error)
             }
         }
 
         // Subscribe to photos
         photoTokens[sessionId] = streamSession.photoDataPublisher.listen { [weak self] photoData in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handlePhotoCapture(sessionId: sessionId, photoData: photoData)
             }
         }

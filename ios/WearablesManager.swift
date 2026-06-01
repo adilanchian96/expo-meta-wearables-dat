@@ -69,13 +69,13 @@ public final class WearablesManager {
 
     private func setupListeners() {
         registrationStateToken = Wearables.shared.addRegistrationStateListener { [weak self] state in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleRegistrationStateChange(state)
             }
         }
 
         devicesToken = Wearables.shared.addDevicesListener { [weak self] devices in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleDevicesChange(devices)
             }
         }
@@ -92,12 +92,12 @@ public final class WearablesManager {
             queue: .main
         ) { [weak self] notification in
             guard let url = notification.userInfo?["url"] as? URL else {
-                Task { @MainActor in
+                Swift.Task { @MainActor in
                     self?.logger.warn("Manager", "URL callback received but URL is missing")
                 }
                 return
             }
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 await self?.handleUrl(url)
             }
         }
@@ -155,7 +155,7 @@ public final class WearablesManager {
             if let device = Wearables.shared.deviceForIdentifier(deviceId) {
                 // Link state listener
                 let linkToken = device.addLinkStateListener { [weak self] linkState in
-                    Task { @MainActor in
+                    Swift.Task { @MainActor in
                         self?.handleDeviceLinkStateChange(deviceId: deviceId, linkState: linkState)
                     }
                 }
@@ -163,14 +163,14 @@ public final class WearablesManager {
 
                 // Compatibility listener
                 let compatToken = device.addCompatibilityListener { [weak self] compatibility in
-                    Task { @MainActor in
+                    Swift.Task { @MainActor in
                         self?.handleDeviceCompatibilityChange(deviceId: deviceId, compatibility: compatibility)
                     }
                 }
                 deviceCompatibilityTokens[deviceId] = compatToken
 
                 // Session state listener (SDK 0.7: SessionManager.requestSessionHandle)
-                Task { [weak self] in
+                Swift.Task { [weak self] in
                     guard let wearablesPrivate = Wearables.shared as? WearablesPrivate else {
                         self?.logger.warn("Manager", "SessionManager unavailable for device session state")
                         return
@@ -178,7 +178,7 @@ public final class WearablesManager {
                     let sessionToken = await wearablesPrivate.sessionManager.requestSessionHandle(
                         forDeviceId: deviceId
                     ) { [weak self] state in
-                        Task { @MainActor in
+                        Swift.Task { @MainActor in
                             self?.handleDeviceSessionStateChange(deviceId: deviceId, sessionState: state)
                         }
                     }
@@ -209,8 +209,8 @@ public final class WearablesManager {
 
         // Delayed re-emit: properties like compatibility may update after connection is established
         if linkState == .connected {
-            Task { @MainActor [weak self] in
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
+            Swift.Task { @MainActor [weak self] in
+                try? await Swift.Task.sleep(nanoseconds: 1_500_000_000)
                 self?.emitDeviceList()
             }
         }
@@ -282,7 +282,7 @@ public final class WearablesManager {
 
         // Listen to session state
         let stateToken = session.statePublisher.listen { [weak self] state in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleSessionStateChange(sessionId: sessionId, state: state)
             }
         }
@@ -290,7 +290,7 @@ public final class WearablesManager {
 
         // Listen to session errors
         let errorToken = session.errorPublisher.listen { [weak self] error in
-            Task { @MainActor in
+            Swift.Task { @MainActor in
                 self?.handleSessionError(sessionId: sessionId, error: error)
             }
         }
